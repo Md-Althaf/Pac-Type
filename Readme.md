@@ -2,7 +2,7 @@
 A hybrid mashup between Pac-Man and Chrome Dino Run with a fast-paced typing twist!
 
 ## How to play ?
-You play as Pac-Man surviving against waves of incoming word obstacles.
+You play as Pac-Man, surviving against waves of incoming word obstacles.
 
 Type the Words: Complete the full word above an incoming target to destroy it before it hits you.
 
@@ -12,8 +12,15 @@ Special Words: Watch out for rare, tricky words containing numbers and special c
 
 Restart (R): Hit R after a game over to jump straight back into the action.
 
-## why i made this ?
+## Why I made this ?
 The original idea was to build a simple, classic Dino Run clone. Along the way, it evolved into a hybrid arcade game where Pac-Man battles incoming text! It's a great way to boost your typing speed and reflexes... or maybe just end up smashing your keyboard.
+
+## AI usage 
+Collison Math: Figuring out the exact distance between Pac-Man and monsters so the game knows the instant hey touch.
+
+Text Alignment: Automatically centering floating words directly over moving monsters, no matter how short or long the word is.
+
+Smart Keyboard Tracking: Instantly matching your keypresses to the right monster and clearing destroyed words off the screen.
 
 **The Ultimate Challenge:** If you can hit a score of **100** in this game, you are an absolute legend.
 
