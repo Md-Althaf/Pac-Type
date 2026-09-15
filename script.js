@@ -5,7 +5,6 @@ const groundY = 250;
 const GRAVITY = 0.8;
 const JUMP_FORCE = -13;
 
-
 const pacman = {
     x: 60,
     y: groundY - 20,
@@ -39,13 +38,20 @@ function updatePacman() {
 
     pacman.timer++;
     if (pacman.timer >= 60) {
-        pacman.mouthOpen = !pacman.mouthOpen;
+        if (pacman.mouthOpen === true) {
+            pacman.mouthOpen = false;
+        } else {
+            pacman.mouthOpen = true;
+        }
         pacman.timer = 0;
     }
 }
 
 function drawPacman() {
-    const mouthGap = pacman.mouthOpen ? 0.25 : 0.02;
+    let mouthGap = 0.02;
+    if (pacman.mouthOpen === true) {
+        mouthGap = 0.25;
+    }
 
     ctx.beginPath();
     ctx.arc(
@@ -56,11 +62,16 @@ function drawPacman() {
         (2 - mouthGap) * Math.PI
     );
     ctx.lineTo(pacman.x, pacman.y);
-    ctx.fillStyle = pacmanGlow > 0 ? '#2ecc71' : '#ffff00';
+    
+    if (pacmanGlow > 0) {
+        ctx.fillStyle = '#2ecc71';
+    } else {
+        ctx.fillStyle = '#ffff00';
+    }
+    
     ctx.fill();
     ctx.closePath();
 }
-
 
 let groundShift = 0;
 const groundSpeed = 4;
@@ -85,7 +96,6 @@ function drawGround() {
         ctx.stroke();
     }
 }
-
 
 let clouds = [
     { x: 150, y: 60, size: 20 },
@@ -113,9 +123,8 @@ function drawClouds() {
     }
 }
 
-
 const normalWords = ['cat', 'dog', 'run', 'jump', 'code', 'fast', 'type', 'game', 'word', 'play', 'sun', 'moon', 'star', 'tree', 'book'];
-const hardWords = ['c0d3!', 'wh@t?', 'gr8-job', '50%off', 'h4x0r', '#trend', 'z1gzaag', 'qu!ckly'];
+const hardWords = ['c0d3!', 'wh@t!', 'gr8-job', '50%off', 'h4x0r', '#trend', 'z1gzaag', 'qu!ckly'];
 
 let monsters = [];
 let spawnTimer = 0;
@@ -126,15 +135,37 @@ let score = 0;
 let gameOver = false;
 
 function spawnMonster() {
-    const isHard = makeHardNext || Math.random() < 0.1;
+    let isHard = false;
+    if (makeHardNext === true || Math.random() < 0.1) {
+        isHard = true;
+    }
     makeHardNext = false;
 
-    const chosenWord = isHard
-        ? hardWords[Math.floor(Math.random() * hardWords.length)]
-        : normalWords[Math.floor(Math.random() * normalWords.length)];
+    let chosenWord = '';
+    if (isHard === true) {
+        let randomIndex = Math.floor(Math.random() * hardWords.length);
+        chosenWord = hardWords[randomIndex];
+    } else {
+        let randomIndex = Math.floor(Math.random() * normalWords.length);
+        chosenWord = normalWords[randomIndex];
+    }
 
     const height = 40;
-    const y = groundY - height - Math.random() * 40;
+    let y = 0;
+
+
+    if (isHard === true) {
+        y = groundY - height;
+    } else {
+        y = groundY - height - Math.random() * 40;
+    }
+
+    let speed = 3;
+    let points = 1;
+    if (isHard === true) {
+        speed = 5;
+        points = 10;
+    }
 
     monsters.push({
         word: chosenWord,
@@ -143,9 +174,9 @@ function spawnMonster() {
         y: y,
         width: 30,
         height: height,
-        speed: isHard ? 5 : 3,
+        speed: speed,
         isHard: isHard,
-        points: isHard ? 10 : 1,
+        points: points,
         alreadyPassed: false
     });
 }
@@ -164,7 +195,6 @@ function updateMonsters() {
     for (const m of monsters) {
         m.x -= m.speed;
 
-        
         const xDiff = pacman.x - (m.x + m.width / 2);
         const yDiff = pacman.y - (m.y + m.height / 2);
         const distance = Math.hypot(xDiff, yDiff);
@@ -186,10 +216,14 @@ function drawMonsters() {
     for (const m of monsters) {
         ctx.beginPath(); 
         
-        ctx.fillStyle = m.isHard ? '#f39c12' : '#c0392b';
+        if (m.isHard === true) {
+            ctx.fillStyle = '#f39c12';
+        } else {
+            ctx.fillStyle = '#c0392b';
+        }
+
         ctx.arc(m.x + m.width / 2, m.y + m.height / 2, 12, 0, Math.PI * 2);
         ctx.fill();
-
 
         if (m === activeMonster) {
             ctx.fillStyle = '#ffffff';
@@ -198,7 +232,6 @@ function drawMonsters() {
             ctx.fillText('▼', m.x + m.width / 2, m.y - 22);
         }
 
-        
         ctx.font = 'bold 14px monospace';
         ctx.textAlign = 'left';
 
@@ -210,7 +243,15 @@ function drawMonsters() {
 
         for (let i = 0; i < m.word.length; i++) {
             const letter = m.word[i];
-            ctx.fillStyle = i < m.typed.length ? '#27ae60' : (m.isHard ? '#f39c12' : '#ffffff');
+            
+            if (i < m.typed.length) {
+                ctx.fillStyle = '#27ae60';
+            } else if (m.isHard === true) {
+                ctx.fillStyle = '#f39c12';
+            } else {
+                ctx.fillStyle = '#ffffff';
+            }
+
             ctx.fillText(letter, charX, textY);
             charX += ctx.measureText(letter).width;
         }
@@ -252,7 +293,6 @@ function restart() {
     pacman.mouthOpen = false;
 }
 
-
 window.addEventListener('keydown', (e) => {
     if (e.code === 'Space') {
         e.preventDefault();
@@ -290,7 +330,6 @@ function typeLetter(key) {
         }
     }
 }
-
 
 function loop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
